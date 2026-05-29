@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokeHub - Time</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="time-style.css">
+</head>
+<body>
+
+  <h1 class="POKEHUB">Time</h1>
+  <p class="fonte">Escolha seu Time</p>
+
+  <!-- Campo com os 6 slots do time (gerado por JS) -->
+  <div class="campo-batalha" id="campoBatalha"></div>
+
+  <!-- Botões Voltar e Salvar -->
+  <div class="espaco-botoes">
+    <button class="botao-sair" onclick="voltarPagina()">Voltar</button>
+    <button class="botao-salvar" onclick="salvarTime()">Salvar Time</button>
+  </div>
+
+  <!-- Modal de seleção de Pokémon -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+
+      <div class="modal-header">
+        <span class="modal-title">Escolha um Pokémon</span>
+        <button class="modal-close" onclick="fecharModal()">✕</button>
+      </div>
+
+      <div class="modal-search">
+        <input type="text" id="searchInput" placeholder="Buscar pokémon..." oninput="filtrarPokemons()">
+      </div>
+
+      <div class="pokemon-grid" id="pokemonGrid">
+        <div class="modal-loading">Carregando...</div>
+      </div>
+
+      <button class="load-more-btn" id="loadMoreBtn" onclick="carregarMais()" style="display:none;">
+        Carregar mais ▼
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Notificação de salvo -->
+  <div class="toast" id="toast">✔ Time salvo!</div>
+
+  <script>
+    // ─── ESTADO ───────────────────────────────────────────────
+    let time = JSON.parse(localStorage.getItem('meuTime') || '[null,null,null,null,null,null]');
+    let slotAtivo = null;
+    let todosPokemons = [];
+    let offset = 0;
+    const LIMIT = 60;
+
+    // ─── RENDERIZAR SLOTS ─────────────────────────────────────
+    function renderizarSlots() {
+      const campo = document.getElementById('campoBatalha');
+      campo.innerHTML = '';
+
+      for (let i = 0; i < 6; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot-pokemon';
+        slot.onclick = () => abrirModal(i);
+
+        if (time[i]) {
+          const img = document.createElement('img');
+          img.src = time[i].sprite;
+          img.alt = time[i].nome;
+          slot.appendChild(img);
+
+          const rmBtn = document.createElement('button');
+          rmBtn.className = 'remove-btn';
+          rmBtn.innerHTML = '✕';
+          rmBtn.onclick = (e) => {
+            e.stopPropagation();
+            removerPokemon(i);
+          };
+          slot.appendChild(rmBtn);
+        } else {
+          const plus = document.createElement('span');
+          plus.className = 'plus-icon';
+          plus.textContent = '+';
+          slot.appendChild(plus);
+        }
+
+        campo.appendChild(slot);
+      }
+    }
+
+    function removerPokemon(index) {
+      time[index] = null;
+      renderizarSlots();
+    }
+
+    // ─── MODAL ────────────────────────────────────────────────
+    function abrirModal(index) {
+      slotAtivo = index;
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById('searchInput').value = '';
+
+      if (todosPokemons.length === 0) {
+        carregarPokemons();
+      } else {
+        renderizarCards(todosPokemons);
+      }
+    }
+
+    function fecharModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', function (e) {
+      if (e.target === this) fecharModal();
+    });
+
+    // ─── CARREGAR POKÉMONS DA API ─────────────────────────────
+    async function carregarPokemons() {
+      const grid = document.getElementById('pokemonGrid');
+      grid.innerHTML = '<div class="modal-loading">Carregando Pokémons...</div>';
+
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${LIMIT}&offset=0`);
+        const data = await res.json();
+        offset = LIMIT;
+
+        const detalhes = await Promise.all(
+          data.results.map(p => fetch(p.url).then(r => r.json()))
+        );
+
+        todosPokemons = detalhes.map(d => ({
+          id: d.id,
+          nome: d.name,
+          sprite: d.sprites.front_default ||
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${d.id}.png`
+        }));
+
+        renderizarCards(todosPokemons);
+        document.getElementById('loadMoreBtn').style.display = 'block';
+      } catch (e) {
+        grid.innerHTML = '<div class="modal-loading">Erro ao carregar. Tente novamente.</div>';
+      }
+    }
+
+    async function carregarMais() {
+      const btn = document.getElementById('loadMoreBtn');
+      btn.textContent = 'Carregando...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${LIMIT}&offset=${offset}`);
+        const data = await res.json();
+        offset += LIMIT;
+
+        const detalhes = await Promise.all(
+          data.results.map(p => fetch(p.url).then(r => r.json()))
+        );
+
+        const novos = detalhes.map(d => ({
+          id: d.id,
+          nome: d.name,
+          sprite: d.sprites.front_default ||
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${d.id}.png`
+        }));
+
+        todosPokemons = [...todosPokemons, ...novos];
+        renderizarCards(todosPokemons);
+      } catch (e) {
+        console.error('Erro ao carregar mais:', e);
+      }
+
+      btn.textContent = 'Carregar mais ▼';
+      btn.disabled = false;
+    }
+
+    // ─── RENDERIZAR CARDS ─────────────────────────────────────
+    function renderizarCards(lista) {
+      const grid = document.getElementById('pokemonGrid');
+      grid.innerHTML = '';
+
+      if (lista.length === 0) {
+        grid.innerHTML = '<div class="modal-loading">Nenhum pokémon encontrado.</div>';
+        return;
+      }
+
+      lista.forEach(pk => {
+        const card = document.createElement('div');
+        card.className = 'pokemon-card';
+        card.innerHTML = `
+          <img src="${pk.sprite}" alt="${pk.nome}" loading="lazy">
+          <span>#${String(pk.id).padStart(3, '0')} ${pk.nome}</span>
+        `;
+        card.onclick = () => selecionarPokemon(pk);
+        grid.appendChild(card);
+      });
+    }
+
+    // ─── FILTRAR BUSCA ────────────────────────────────────────
+    function filtrarPokemons() {
+      const termo = document.getElementById('searchInput').value.toLowerCase();
+      const filtrados = todosPokemons.filter(p => p.nome.includes(termo));
+      renderizarCards(filtrados);
+      document.getElementById('loadMoreBtn').style.display = termo ? 'none' : 'block';
+    }
+
+    // ─── SELECIONAR POKÉMON ───────────────────────────────────
+    function selecionarPokemon(pk) {
+      time[slotAtivo] = pk;
+      renderizarSlots();
+      fecharModal();
+    }
+
+    // ─── SALVAR NO LOCALSTORAGE ───────────────────────────────
+    function salvarTime() {
+      localStorage.setItem('meuTime', JSON.stringify(time));
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ─── VOLTAR ───────────────────────────────────────────────
+    function voltarPagina() {
+      history.back();
+    }
+
+    // ─── INICIALIZAR ──────────────────────────────────────────
+    renderizarSlots();
+  </script>
+
+</body>
+</html>
