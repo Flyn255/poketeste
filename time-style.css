@@ -16,9 +16,7 @@ body {
   font-family: 'Press Start 2P', system-ui;
 }
 
-/* ── TÍTULOS ─────────────────────────────────────────────── */
-
-.POKEHUB {
+.POKETITLE {
   font-family: 'Press Start 2P', system-ui;
   color: #FFCC00;
   text-shadow: 3px 3px 0px #3B4CCA;
@@ -36,24 +34,25 @@ body {
   margin-bottom: 20px;
 }
 
-/* ── CAMPO DE BATALHA ────────────────────────────────────── */
+/* campo de batalha */
 
 .campo-batalha {
   background-color: #1a1a2e;
   border-radius: 130px;
   border: #ffcc00 solid 5px;
-  padding: 50px 80px;
-  width: 70%;
+  padding: 200px 12s0px;
+  width: 50%;
+  height:900px;
   margin: 40px auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   justify-items: center;
   align-items: center;
-  gap: 30px;
+  gap: -40px;
 }
 
-/* ── SLOTS DOS POKÉMONS ──────────────────────────────────── */
+/* slots dos pokeku */
 
 .slot-pokemon {
   width: 100px;
@@ -70,11 +69,6 @@ body {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.slot-pokemon:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 16px #ffcc00aa;
-}
-
 .slot-pokemon img {
   width: 85px;
   height: 85px;
@@ -82,7 +76,7 @@ body {
   image-rendering: pixelated;
 }
 
-.slot-pokemon .plus-icon {
+.slot-pokemon .mais-icon {
   font-family: 'Press Start 2P', system-ui;
   font-size: 24px;
   color: #FFCC00;
@@ -109,11 +103,7 @@ body {
   z-index: 10;
 }
 
-.slot-pokemon:hover .remove-btn {
-  display: flex;
-}
-
-/* ── BOTÕES VOLTAR / SALVAR ──────────────────────────────── */
+/* botoes de sair e salvar */
 
 .espaco-botoes {
   display: flex;
@@ -150,12 +140,9 @@ body {
   background: linear-gradient(135deg, #0f5132, #198754);
 }
 
-.botao-sair:hover,
-.botao-salvar:hover {
-  opacity: 0.85;
-}
 
-/* ── TOAST ───────────────────────────────────────────────── */
+
+/* toasts */
 
 .toast {
   position: fixed;
@@ -177,7 +164,7 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ── MODAL OVERLAY ───────────────────────────────────────── */
+/*overlay do modal*/
 
 .modal-overlay {
   position: fixed;
@@ -205,9 +192,9 @@ body {
   overflow: hidden;
 }
 
-/* ── MODAL HEADER ────────────────────────────────────────── */
+/* leitor dos modaises ai;; */
 
-.modal-header {
+.modal-cabecao {
   padding: 20px 24px 12px;
   border-bottom: 2px solid #ffcc0055;
   display: flex;
@@ -215,14 +202,14 @@ body {
   align-items: center;
 }
 
-.modal-title {
+.modal-titulo {
   font-family: 'Press Start 2P', system-ui;
   color: #FFCC00;
   text-shadow: 2px 2px 0 #3B4CCA;
   font-size: 16px;
 }
 
-.modal-close {
+.modal-fecha {
   background: none;
   border: none;
   color: #ffcc00;
@@ -231,7 +218,7 @@ body {
   font-family: 'Press Start 2P', system-ui;
 }
 
-/* ── MODAL SEARCH ────────────────────────────────────────── */
+/* pesquisa dos modais*/
 
 .modal-search {
   padding: 12px 24px;
@@ -253,7 +240,7 @@ body {
   color: #aaa;
 }
 
-/* ── GRID DE POKÉMONS ────────────────────────────────────── */
+/*grid dos pokeku*/
 
 .pokemon-grid {
   display: grid;
@@ -264,7 +251,7 @@ body {
   flex: 1;
 }
 
-.pokemon-card {
+.carta-pokemon {
   background: #0d0d1e;
   border: 2px solid #3B4CCA;
   border-radius: 14px;
@@ -276,19 +263,15 @@ body {
   transition: border-color 0.2s, transform 0.2s;
 }
 
-.pokemon-card:hover {
-  border-color: #ffcc00;
-  transform: scale(1.06);
-}
 
-.pokemon-card img {
+.carta-pokemon img {
   width: 72px;
   height: 72px;
   object-fit: contain;
   image-rendering: pixelated;
 }
 
-.pokemon-card span {
+.carta-pokemon span {
   font-family: 'Press Start 2P', system-ui;
   font-size: 7px;
   color: #fff;
@@ -297,7 +280,7 @@ body {
   text-transform: capitalize;
 }
 
-/* ── LOADING / CARREGAR MAIS ─────────────────────────────── */
+/* carregar mais */
 
 .modal-loading {
   text-align: center;
@@ -307,7 +290,7 @@ body {
   color: #ffcc00;
 }
 
-.load-more-btn {
+.carregar-mais-btn {
   margin: 10px auto 16px;
   display: block;
   background: #3B4CCA;
@@ -319,8 +302,4 @@ body {
   padding: 10px 20px;
   cursor: pointer;
   transition: opacity 0.2s;
-}
-
-.load-more-btn:hover {
-  opacity: 0.8;
 }
