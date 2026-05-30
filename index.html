@@ -11,25 +11,25 @@
 </head>
 <body>
 
-  <h1 class="POKEHUB">Time</h1>
+  <h1 class="POKETITLE">Time</h1>
   <p class="fonte">Escolha seu Time</p>
 
-  <!-- Campo com os 6 slots do time (gerado por JS) -->
+  <!-- campo com os 6 slots do time (gerado por JS) -->
   <div class="campo-batalha" id="campoBatalha"></div>
 
-  <!-- Botões Voltar e Salvar -->
+  <!-- botaums de sair e save -->
   <div class="espaco-botoes">
     <button class="botao-sair" onclick="voltarPagina()">Voltar</button>
     <button class="botao-salvar" onclick="salvarTime()">Salvar Time</button>
   </div>
 
-  <!-- Modal de seleção de Pokémon -->
+  <!-- modal de sel dos pokeku-->  
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
 
-      <div class="modal-header">
-        <span class="modal-title">Escolha um Pokémon</span>
-        <button class="modal-close" onclick="fecharModal()">✕</button>
+      <div class="modal-cabecao">
+        <span class="modal-titulo">Escolha um Pokémon</span>
+        <button class="modal-fecha" onclick="fecharModal()">✕</button>
       </div>
 
       <div class="modal-search">
@@ -40,25 +40,25 @@
         <div class="modal-loading">Carregando...</div>
       </div>
 
-      <button class="load-more-btn" id="loadMoreBtn" onclick="carregarMais()" style="display:none;">
-        Carregar mais ▼
+      <button class="carregar-mais-btn" id="loadMoreBtn" onclick="carregarMais()" style="display:none;">
+        Carregar mais
       </button>
 
     </div>
   </div>
 
-  <!-- Notificação de salvo -->
-  <div class="toast" id="toast">✔ Time salvo!</div>
+  <!-- notificacao salvo -->
+  <div class="toast" id="toast">Time salvo!</div>
 
   <script>
-    // ─── ESTADO ───────────────────────────────────────────────
+    // parada pra ler os arrays do java 
     let time = JSON.parse(localStorage.getItem('meuTime') || '[null,null,null,null,null,null]');
     let slotAtivo = null;
     let todosPokemons = [];
     let offset = 0;
     const LIMIT = 60;
 
-    // ─── RENDERIZAR SLOTS ─────────────────────────────────────
+    // render dos slots do time
     function renderizarSlots() {
       const campo = document.getElementById('campoBatalha');
       campo.innerHTML = '';
@@ -84,7 +84,7 @@
           slot.appendChild(rmBtn);
         } else {
           const plus = document.createElement('span');
-          plus.className = 'plus-icon';
+          plus.className = 'mais-icon';
           plus.textContent = '+';
           slot.appendChild(plus);
         }
@@ -98,7 +98,7 @@
       renderizarSlots();
     }
 
-    // ─── MODAL ────────────────────────────────────────────────
+    // modal
     function abrirModal(index) {
       slotAtivo = index;
       document.getElementById('modalOverlay').classList.add('open');
@@ -119,7 +119,7 @@
       if (e.target === this) fecharModal();
     });
 
-    // ─── CARREGAR POKÉMONS DA API ─────────────────────────────
+    // carregamento de pokeku do API
     async function carregarPokemons() {
       const grid = document.getElementById('pokemonGrid');
       grid.innerHTML = '<div class="modal-loading">Carregando Pokémons...</div>';
@@ -178,7 +178,7 @@
       btn.disabled = false;
     }
 
-    // ─── RENDERIZAR CARDS ─────────────────────────────────────
+    // render dos pokeku pra selecionar 
     function renderizarCards(lista) {
       const grid = document.getElementById('pokemonGrid');
       grid.innerHTML = '';
@@ -190,7 +190,7 @@
 
       lista.forEach(pk => {
         const card = document.createElement('div');
-        card.className = 'pokemon-card';
+        card.className = 'carta-pokemon';
         card.innerHTML = `
           <img src="${pk.sprite}" alt="${pk.nome}" loading="lazy">
           <span>#${String(pk.id).padStart(3, '0')} ${pk.nome}</span>
@@ -200,7 +200,7 @@
       });
     }
 
-    // ─── FILTRAR BUSCA ────────────────────────────────────────
+    // filtro de pokeku por nome 
     function filtrarPokemons() {
       const termo = document.getElementById('searchInput').value.toLowerCase();
       const filtrados = todosPokemons.filter(p => p.nome.includes(termo));
@@ -208,14 +208,14 @@
       document.getElementById('loadMoreBtn').style.display = termo ? 'none' : 'block';
     }
 
-    // ─── SELECIONAR POKÉMON ───────────────────────────────────
+    // selec os pokeku
     function selecionarPokemon(pk) {
       time[slotAtivo] = pk;
       renderizarSlots();
       fecharModal();
     }
 
-    // ─── SALVAR NO LOCALSTORAGE ───────────────────────────────
+    // salvar no localstorage
     function salvarTime() {
       localStorage.setItem('meuTime', JSON.stringify(time));
       const toast = document.getElementById('toast');
@@ -223,12 +223,11 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // ─── VOLTAR ───────────────────────────────────────────────
+    // voitar
     function voltarPagina() {
       history.back();
     }
 
-    // ─── INICIALIZAR ──────────────────────────────────────────
     renderizarSlots();
   </script>
 
